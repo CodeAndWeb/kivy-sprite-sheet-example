@@ -1,0 +1,2 @@
+# Core dependencies
+kivy==2.3.1

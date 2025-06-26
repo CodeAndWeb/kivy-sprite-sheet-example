@@ -1,9 +1,22 @@
+#!/bin/bash
+set -e
+
+echo "Setting up Kivy Sprite Sheet Animation Example..."
+
 # Create virtual environment
+echo "Creating virtual environment..."
 python3 -m venv venv
+
+# Activate virtual environment
+echo "Activating virtual environment..."
 source venv/bin/activate
 
-# Install Kivy
-pip install kivy==2.3.1
+# Upgrade pip
+echo "Upgrading pip..."
+pip install --upgrade pip
 
-# Run the application
-python main.py
+# Install dependencies
+echo "Installing dependencies..."
+pip install -r requirements.txt
+
+echo "Setup complete! Run './run.sh' to start the application."
