@@ -28,7 +28,7 @@ class AnimatedCharacter(Image):
         super().__init__(**kwargs)
         
         # Load animation frames
-        self.frames = frames_for_animation("cityscene", "capguy_walk_")
+        self.frames = frames_for_animation("assets-optimized/cityscene", "capguy_walk_")
         self.frame_count = len(self.frames)
         self.frame_duration = 1.0 / FRAME_RATE
 
@@ -88,7 +88,7 @@ class CitySceneApp(App):
         
         # Add background image
         background = Image(
-            source='atlas://cityscene/background',
+            source='atlas://assets-optimized/cityscene/background',
             fit_mode="fill",
             size_hint=(1, 1),
             pos_hint={'x': 0, 'y': 0}

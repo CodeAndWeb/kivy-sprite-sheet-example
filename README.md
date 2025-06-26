@@ -21,16 +21,18 @@ source venv/bin/activate
 pip install kivy==2.3.1
 
 # Run the application
-python main.py
+python src/main.py
 ```
 
 ## Project Structure
 
-- `main.py` - Main application with AnimatedCharacter class
-- `cityscene.atlas` - Sprite sheet texture atlas
-- `cityscene.png` - Packed sprite sheet image
-- `sprites/` - Source sprite images organized by character/animation
-    - `cityscene.tps` - TexturePacker project file
+- `src/main.py` - Main application with AnimatedCharacter class
+- `assets-optimized/` - Processed game assets
+  - `cityscene.atlas` - Sprite sheet texture atlas
+  - `cityscene.png` - Packed sprite sheet image
+- `assets-raw/` - Source sprite images organized by character/animation
+  - `cityscene.tps` - TexturePacker project file
+  - `cityscene/` - Raw sprite images
 
 ## Animation System
 
@@ -38,7 +40,7 @@ The animation uses a single `Animation` object that drives both:
 - Sprite frame cycling (8 walk frames)
 - Character movement (24 pixels per frame)
 
-Key constants in `main.py`:
+Key constants in `src/main.py`:
 - `FRAME_RATE`: 6 fps animation speed
 - `PIXELS_PER_FRAME`: 24px movement per frame
 - `DEFAULT_Y_POSITION`: 240px vertical position
@@ -50,6 +52,6 @@ Key constants in `main.py`:
 
 ## Customization
 
-- **Animation Speed**: Modify `FRAME_RATE` in main.py:13
-- **Movement Speed**: Modify `PIXELS_PER_FRAME` in main.py:14
-- **Character Height**: Modify `DEFAULT_Y_POSITION` in main.py:15
+- **Animation Speed**: Modify `FRAME_RATE` in src/main.py:13
+- **Movement Speed**: Modify `PIXELS_PER_FRAME` in src/main.py:14
+- **Character Height**: Modify `DEFAULT_Y_POSITION` in src/main.py:15

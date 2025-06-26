@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>6</int>
         <key>texturePackerVersion</key>
-        <string>7.7.0</string>
+        <string>7.7.2</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -124,7 +124,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>../cityscene.atlas</filename>
+                <filename>../assets-optimized/cityscene.atlas</filename>
             </struct>
         </map>
         <key>multiPackMode</key>
