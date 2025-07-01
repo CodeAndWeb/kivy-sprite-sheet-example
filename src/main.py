@@ -1,12 +1,12 @@
 import kivy
 kivy.require('2.1.0')
+
 from kivy.app import App
 from kivy.uix.image import Image
 from kivy.uix.floatlayout import FloatLayout
-from kivy.properties import NumericProperty
 from kivy.core.window import Window
 from kivy.atlas import Atlas
-from kivy.animation import Animation
+from kivy.clock import Clock
 from typing import List
 
 # Animation constants
@@ -21,9 +21,6 @@ def frames_for_animation(atlas_path: str, prefix: str) -> List[str]:
     return [f"atlas://{atlas_path}/{k}" for k in frame_keys]
 
 class AnimatedCharacter(Image):
-    
-    frame_index = NumericProperty(0)
-    
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         
@@ -36,51 +33,40 @@ class AnimatedCharacter(Image):
         self.size_hint = (None, None)
         self.source = self.frames[0]
         
-        # Set size based on texture
-        self.size = self.texture.size
+        # Bind to texture to set size when available
+        self.bind(texture=self._on_texture)  # type: ignore[attr-defined]
         
         # Initialize position
         self.x = -self.width  # Start off-screen left
         self.y = DEFAULT_Y_POSITION
         
-        # Start the animation
-        self.start_animation()
-    
-    def start_animation(self) -> None:
-        """Start the frame animation which drives both sprite frames and movement."""
-        self.frame_index = 0
+        # Animation step tracking
+        self.step = 0
+        screen_distance = Window.width + (2 * self.width)
+        self.total_steps = int(screen_distance / PIXELS_PER_FRAME)
         
-        # Calculate total frames needed to cross the screen
-        screen_distance = Window.width + (2 * self.width)  # From off-screen left to off-screen right
-        total_frames_needed = int(screen_distance / PIXELS_PER_FRAME)
+        # Schedule timer-based updates
+        Clock.schedule_interval(self._update, self.frame_duration)
+
+    def _update(self, dt):
+        """Update sprite frame and position on each clock tick."""
+        self.step += 1
         
-        # Create animation that cycles through frames for the duration needed
-        animation_duration = total_frames_needed * self.frame_duration
-        
-        self.animation = Animation(
-            frame_index=total_frames_needed,
-            duration=animation_duration,
-            transition='linear'
-        )
-        self.animation.bind(on_complete=self.on_animation_complete)
-        self.animation.start(self)
-    
-    def on_animation_complete(self, animation: Animation, character: 'AnimatedCharacter') -> None:
-        """Restart animation when it completes."""
-        # Reset position to start
-        self.x = -self.width
-        self.start_animation()
-    
-    def on_frame_index(self, instance: 'AnimatedCharacter', value: float) -> None:
-        """Update both sprite frame and position when frame_index changes."""
-        # Update sprite frame (cycle through available frames)
-        frame_idx = int(value) % self.frame_count
+        # Update sprite frame
+        frame_idx = self.step % self.frame_count
         self.source = self.frames[frame_idx]
         
-        # Update position - move character based on frame progression
-        frame_step = int(value)
-        new_x = -self.width + (frame_step * PIXELS_PER_FRAME)
-        self.x = new_x
+        # Update position
+        self.x = -self.width + (self.step * PIXELS_PER_FRAME)
+        
+        # Loop back when reaching the end
+        if self.step >= self.total_steps:
+            self.step = 0
+            self.x = -self.width
+
+    def _on_texture(self, instance, texture):
+        """Set widget size once texture is loaded."""
+        self.size = texture.size
 
 class CitySceneApp(App):
     def build(self) -> FloatLayout:
