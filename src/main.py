@@ -1,91 +1,71 @@
-import kivy
-kivy.require('2.1.0')
+"""Kivy application that animates a character across a city scene background."""
 
-from kivy.app import App
-from kivy.uix.image import Image
-from kivy.uix.floatlayout import FloatLayout
-from kivy.core.window import Window
+import kivy
+kivy.require("2.3.0")
+
 from kivy.atlas import Atlas
+from kivy.app import App
 from kivy.clock import Clock
-from typing import List
+from kivy.core.window import Window
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.image import Image
+
+
+def frames_for_animation(atlas_path: str, prefix: str) -> list[str]:
+    """Return frame source URIs from a Kivy atlas."""
+    atlas = Atlas(f"{atlas_path}.atlas")
+    keys = sorted(k for k in atlas.textures if k.startswith(prefix))
+    return [f"atlas://{atlas_path}/{key}" for key in keys]
+
 
 # Animation constants
-FRAME_RATE = 6.0  # frames per second
-PIXELS_PER_FRAME = 24  # How many pixels to move per frame change
-DEFAULT_Y_POSITION = 240
+FRAME_RATE = 6.0  # Frames per second
+PIXELS_PER_FRAME = 24.0  # Pixels per frame movement
 
-def frames_for_animation(atlas_path: str, prefix: str) -> List[str]:
-    """Return a list of frame sources from a Kivy atlas for animation."""
-    atlas = Atlas(atlas_path + ".atlas")
-    frame_keys = sorted([k for k in atlas.textures.keys() if k.startswith(prefix)])
-    return [f"atlas://{atlas_path}/{k}" for k in frame_keys]
 
 class AnimatedCharacter(Image):
+    """Image widget that cycles through frames to animate a character."""
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        
-        # Load animation frames
-        self.frames = frames_for_animation("assets-optimized/cityscene", "capguy_walk_")
-        self.frame_count = len(self.frames)
-        self.frame_duration = 1.0 / FRAME_RATE
-
-        # Setup widget properties
+        self.frames = frames_for_animation(
+            "assets-optimized/cityscene", "capguy_walk_"
+        )
+        # start position, initial frame
+        self.x = -self.width
+        self.y = 240
+        self.frame_index = 0
         self.size_hint = (None, None)
-        self.source = self.frames[0]
-        
-        # Bind to texture to set size when available
-        self.bind(texture=self._on_texture)  # type: ignore[attr-defined]
-        
-        # Initialize position
-        self.x = -self.width  # Start off-screen left
-        self.y = DEFAULT_Y_POSITION
-        
-        # Animation step tracking
-        self.step = 0
-        screen_distance = Window.width + (2 * self.width)
-        self.total_steps = int(screen_distance / PIXELS_PER_FRAME)
-        
-        # Schedule timer-based updates
-        Clock.schedule_interval(self._update, self.frame_duration)
+        self.source = self.frames[self.frame_index]
+        self.bind(texture=self._on_texture)  
+        # schedule updates
+        Clock.schedule_interval(self._update, 1.0 / FRAME_RATE)
 
-    def _update(self, dt):
-        """Update sprite frame and position on each clock tick."""
-        self.step += 1
-        
-        # Update sprite frame
-        frame_idx = self.step % self.frame_count
-        self.source = self.frames[frame_idx]
-        
-        # Update position
-        self.x = -self.width + (self.step * PIXELS_PER_FRAME)
-        
-        # Loop back when reaching the end
-        if self.step >= self.total_steps:
-            self.step = 0
+    def _update(self, dt: float) -> None:
+        """Advance frame and position each tick."""
+        self.frame_index = (self.frame_index + 1) % len(self.frames)
+        self.source = self.frames[self.frame_index]
+        self.x += PIXELS_PER_FRAME
+        if self.x >= Window.width + 2 * self.width:
             self.x = -self.width
 
-    def _on_texture(self, instance, texture):
-        """Set widget size once texture is loaded."""
+    def _on_texture(self, instance, texture) -> None:
+        """Set image size when texture loads."""
         self.size = texture.size
 
-class CitySceneApp(App):
-    def build(self) -> FloatLayout:
-        root = FloatLayout()
-        
-        # Add background image
-        background = Image(
-            source='atlas://assets-optimized/cityscene/background',
-            fit_mode="fill",
-            size_hint=(1, 1),
-            pos_hint={'x': 0, 'y': 0}
-        )
-        root.add_widget(background)
-        
-        # Add animated character
-        character = AnimatedCharacter()
-        root.add_widget(character)
-        
-        return root
 
-if __name__ == '__main__':
+class CitySceneApp(App):
+    """Kivy application to display the animated city scene."""
+
+    def build(self):
+        layout = FloatLayout()
+        background = Image(
+            source="atlas://assets-optimized/cityscene/background",
+            fit_mode="fill",
+        )
+        layout.add_widget(background)
+        layout.add_widget(AnimatedCharacter())
+        return layout
+
+if __name__ == "__main__":
     CitySceneApp().run()
