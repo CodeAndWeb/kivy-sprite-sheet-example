@@ -2,6 +2,17 @@
 
 This project demonstrates how to use sprite sheet animation in [Kivy](https://kivy.org/), featuring an animated character walking across a city-themed background.
 
+<a href="https://www.codeandweb.com/texturepacker/tutorials/how-to-create-sprite-sheets-and-animations-with-kivy">
+<img src="./docs/kivy-sprite-sheet-example.png"/>
+</a>
+
+## Tutorial
+
+This repository is the companion project for our tutorial:
+
+**[Howt to create sprite sheets for Kivy](https://www.codeandweb.com/texturepacker/tutorials/how-to-create-sprite-sheets-and-animations-with-kivy)**
+
+
 ## Quick Start
 
 ### Requirements
@@ -21,12 +32,3 @@ This project demonstrates how to use sprite sheet animation in [Kivy](https://ki
 1. Clone this repository  
 2. Run `init.sh` to set up the environment
 
-## 📁 Project Structure
-
-- `src/main.py` - Main application with AnimatedCharacter class
-- `assets-optimized/` - Processed game assets
-  - `cityscene.atlas` - Sprite sheet texture atlas
-  - `cityscene.png` - Packed sprite sheet image
-- `assets-raw/` - Source sprite images organized by character/animation
-  - `cityscene.tps` - TexturePacker project file
-  - `cityscene/` - Raw sprite images
